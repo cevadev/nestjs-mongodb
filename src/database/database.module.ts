@@ -1,5 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
+//mongoose
+import { MongooseModule } from '@nestjs/mongoose';
 
 //importamos MongoClient para la conexion a MongoDB
 import { MongoClient } from 'mongodb';
@@ -23,6 +25,34 @@ const API_KEY_PROD = 'PROD1212121SA';
 //run();
 @Global()
 @Module({
+  imports: [
+    /* MongooseModule.forRoot('mongodb://localhost:27017', {
+      user: 'root',
+      pass: 'root',
+      dbName: 'platzi-store',
+    }), */
+    //conexion con mongoose de manera asincrona, primero recibimos las variables luego establecemos conexion
+    MongooseModule.forRootAsync({
+      useFactory: (configService: ConfigType<typeof config>) => {
+        const {
+          connection,
+          user,
+          password,
+          host,
+          port,
+          dbName,
+        } = configService.mongo;
+        //retornamos el nuevo objeto de conexion
+        return {
+          uri: `${connection}://${host}:${port}`,
+          user,
+          pass: password,
+          dbName,
+        };
+      },
+      inject: [config.KEY],
+    }),
+  ],
   providers: [
     {
       provide: 'API_KEY',
@@ -43,7 +73,7 @@ const API_KEY_PROD = 'PROD1212121SA';
           password,
           host,
           port,
-          dbname,
+          dbName,
         } = configService.mongo;
         const uri = `${connection}://${user}:${password}@${host}:${port}/?authSource=admin&readPreference=primary`;
         //creamos una instancia del client
@@ -52,7 +82,7 @@ const API_KEY_PROD = 'PROD1212121SA';
         await client.connect();
         //indicamos a la BD de queremos conectarnos
         //const database = client.db('platzi-store');
-        const database = client.db(`${dbname}`);
+        const database = client.db(`${dbName}`);
         //retornamos la BD como injectable para todos los servicios
         return database;
       },
@@ -60,6 +90,7 @@ const API_KEY_PROD = 'PROD1212121SA';
       inject: [config.KEY],
     },
   ],
-  exports: ['API_KEY', 'MONGO'],
+  //exportamos los providers para que cualquier otro servicio lo pueda utilizar
+  exports: ['API_KEY', 'MONGO', MongooseModule],
 })
 export class DatabaseModule {}

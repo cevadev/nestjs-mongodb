@@ -9,6 +9,10 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
+      //lo que viene por query params lo transforma explicitamente
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
 

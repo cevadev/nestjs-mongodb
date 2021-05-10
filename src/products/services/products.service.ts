@@ -1,17 +1,34 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Product } from './../entities/product.entity';
-import { CreateProductDto, UpdateProductDto } from './../dtos/products.dtos';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+  FilterProductsDto,
+} from './../dtos/products.dtos';
 
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, FilterQuery } from 'mongoose';
 @Injectable()
 export class ProductsService {
   constructor(@InjectModel(Product.name) private producModel: Model<Product>) {}
 
-  findAll() {
-    //lanzamos un query a la bd de mongo para obtener los products
-    return this.producModel.find().exec();
+  //parametros opcionales, si los envia el controlador Ok
+  findAll(params?: FilterProductsDto) {
+    if (params) {
+      //filtro generico tipado (FilterQuery) para aplicar otros filtros como por marca, por tipo, etc
+      const filters: FilterQuery<Product> = {};
+      //extraemos los parametros
+      const { limit, offset } = params;
+      const { minPrice, maxPrice } = params;
+      if (minPrice && maxPrice) {
+        //establecemos nuestros filtros con rando
+        filters.price = { $gte: minPrice, $lte: maxPrice };
+      }
+      //lanzamos un query a la bd de mongo para obtener los products paginados
+      //si no tenemos filtros envia un objeto vacio que los pasamos al metodo find()
+      return this.producModel.find(filters).skip(offset).limit(limit).exec();
+    }
   }
 
   async findOne(id: string) {

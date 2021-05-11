@@ -7,8 +7,12 @@ import {
   IsOptional,
   Min,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
 import { PartialType, ApiProperty } from '@nestjs/swagger';
+
+//importamos Category.dto para incluirla dentro de la entiedad Product
+import { CreateCategoryDto } from '../dtos/category.dtos';
 
 export class CreateProductDto {
   @IsString()
@@ -36,6 +40,12 @@ export class CreateProductDto {
   @IsNotEmpty()
   @ApiProperty()
   readonly image: string;
+
+  //definimos la entiedad embebida Category
+  @IsNotEmpty()
+  @ValidateNested()
+  @ApiProperty()
+  readonly category: CreateCategoryDto;
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}

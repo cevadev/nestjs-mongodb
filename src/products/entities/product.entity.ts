@@ -1,5 +1,8 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
+
+//importamos la entidad que vamos a refrencias de 1 a 1
+import { Brand } from './brand.entity';
 @Schema()
 export class Product extends Document {
   //id: number; quitamos el id ya que mongo lo va a definir por nosotros
@@ -17,6 +20,11 @@ export class Product extends Document {
 
   @Prop()
   image: string;
+
+  //atributo brand que hara referencia (1 a 1) a una Brand, el atributo brand guardara el ObjectId que hara referencia
+  //a un objeto Brand
+  @Prop({ type: Types.ObjectId, ref: Brand.name })
+  brand: Brand | Types.ObjectId;
 
   //defenimos nuestra entidad embebida con raw
   @Prop(

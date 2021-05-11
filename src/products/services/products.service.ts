@@ -27,8 +27,15 @@ export class ProductsService {
       }
       //lanzamos un query a la bd de mongo para obtener los products paginados
       //si no tenemos filtros envia un objeto vacio que los pasamos al metodo find()
-      return this.producModel.find(filters).skip(offset).limit(limit).exec();
+      return this.producModel
+        .find(filters)
+        .populate('brand')
+        .skip(offset)
+        .limit(limit)
+        .exec();
     }
+    //populate('brand')-> le decimos que resuelva la referencia al objeto brand que tiene todo objeto Product
+    return this.producModel.find().populate('brand').exec();
   }
 
   async findOne(id: string) {

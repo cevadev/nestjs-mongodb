@@ -9,7 +9,7 @@ export class Product extends Document {
   @Prop()
   description: string;
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: Number, index: true, required: true })
   price: number;
 
   @Prop({ type: Number, required: true })
@@ -21,3 +21,12 @@ export class Product extends Document {
 
 //defiimos el schema a partir de nuestrs clase Product
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+//Indexacion compuesta
+ProductSchema.index({
+  //definimos los campos a indexar
+  //price 1 -> el 1 significa ascendente
+  //stock -1 -> indexado descendente
+  price: 1,
+  stock: -1,
+});

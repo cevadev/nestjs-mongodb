@@ -15,4 +15,14 @@ export class CreateOrderDto {
   readonly products: string[];
 }
 
-export class UpdateOrderDto extends PartialType(CreateOrderDto) {}
+export class UpdateOrderDto extends PartialType(
+  //indicamos que desde CreateOrderDto omita el atributo product
+  OmitType(CreateOrderDto, ['products']),
+) {}
+
+export class AddProductsToOrderDto {
+  //definimos el array de products ids
+  @IsArray()
+  @IsNotEmpty()
+  readonly productsIds: string[];
+}

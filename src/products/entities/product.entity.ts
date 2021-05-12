@@ -3,6 +3,9 @@ import { Document, Types } from 'mongoose';
 
 //importamos la entidad que vamos a refrencias de 1 a 1
 import { Brand } from './brand.entity';
+
+//importamos SubDoc dentro de la entiedad product
+import { SubDoc, SubDocSchema } from './subdoc.entity';
 @Schema()
 export class Product extends Document {
   //id: number; quitamos el id ya que mongo lo va a definir por nosotros
@@ -35,6 +38,15 @@ export class Product extends Document {
     }),
   )
   category: Record<string, any>;
+
+  @Prop({ type: SubDocSchema })
+  subDoc: SubDoc;
+
+  //definimos campos que maneja relacion 1 a muchos
+  @Prop({
+    type: [SubDocSchema],
+  })
+  subDocs: Types.Array<SubDoc>;
 }
 
 //defiimos el schema a partir de nuestrs clase Product
